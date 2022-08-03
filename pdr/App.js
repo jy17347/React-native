@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
-import { Text, View, StyleSheet, Dimensions } from 'react-native'
+import React, { Component } from 'react';
+import { Text, View, StyleSheet, Dimensions } from 'react-native';
 import { Constants, Accelerometer } from 'expo-sensors';
-import * as tf from '@tensorflow/tfjs'
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
 
 
 
@@ -11,7 +12,6 @@ class App extends React.Component {
     state = {
         isTfReady: false,
         model: false,
-        accelerometerData: { x: 0, y: 0, z: 0 },
     }
 
     async componentDidMount() {
