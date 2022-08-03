@@ -1,87 +1,46 @@
-import React, { Component } from 'react';
-import { Text, View, StyleSheet, Dimensions } from 'react-native';
+import React, { Component } from 'react'
+import { Text, View, StyleSheet, Dimensions } from 'react-native'
 import { Constants, Accelerometer } from 'expo-sensors';
+import * as tf from '@tensorflow/tfjs'
 
-export default class App extends Component {
-  state = {
-    accelerometerData: { x: 0, y: 0, z: 0 },
-  };
 
-  componentWillUnmount() {
-    this._unsubscribeFromAccelerometer();
-  }
 
-  componentDidMount() {
-    this._subscribeToAccelerometer();
-  }
+const modelJSON = 'https://raw.githubusercontent.com/jy17347/PDR_Pose_Estimate/develop/models_js/_model_tfjs_/model.json';
 
-  componentWillMount() {
-    const { width, height } = Dimensions.get('window');
-    this.screenWidth = width;
-    this.screenHeight = height;
-    this.boxWidth = this.screenWidth / 10.0;
-  }
+class App extends React.Component {
+    state = {
+        isTfReady: false,
+        model: false,
+        accelerometerData: { x: 0, y: 0, z: 0 },
+    }
 
-  _subscribeToAccelerometer = () => {
-    this._accelerometerSubscription = Accelerometer.addListener(
-      accelerometerData => this.setState({ accelerometerData })
-    );
-  };
+    async componentDidMount() {
+        await tf.ready()
+        this.setState({ isTfReady: true })
+        
+        const model = await tf.loadLayersModel(modelJSON);
+        model.summary();
+        this.setState({ model })
+    }
 
-  _unsubscribeFromAccelerometer = () => {
-    //this._accelerometerSubscription && this._acceleroMeterSubscription.remove();
-    //this._accelerometerSubscription = null;
-  };
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <View
-          style={{
-            position: 'absolute',
-            top:
-              (-this.screenHeight * (this.state.accelerometerData.y - 1.0)) /
-                2.0 -
-              this.boxWidth / 2.0,
-            left:
-              (this.screenWidth * (this.state.accelerometerData.x + 1.0)) /
-                2.0 -
-              this.boxWidth / 2.0,
-            width: this.screenWidth / 10.0,
-            height: this.screenWidth / 10.0,
-            backgroundColor: '#056ECF',
-          }}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.paragraph}>Tilt your phone to move the box!</Text>
-
-          <Text style={styles.paragraph}>
-            x = {this.state.accelerometerData.x.toFixed(2)}
-            {', '}y = {this.state.accelerometerData.y.toFixed(2)}
-            {', '}z = {this.state.accelerometerData.z.toFixed(2)}
-          </Text>
-        </View>
-      </View>
-    );
-  }
+    render() {
+        return (
+            <View style={{
+                flex: 1,
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end'
+            }}>
+               <Text>
+                TF: {this.state.isTfReady ? "Ready" : "Waiting"}
+                </Text> 
+                <Text>
+                MODEL: {this.state.model ? "Ready" : "Waiting"}
+                </Text>
+            </View>
+        )
+    }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
-  },
-  paragraph: {
-    margin: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#34495e',
-  },
-  textContainer: {
-    position: 'absolute',
-    top: 40,
-  },
-});
+
+
+export default App
