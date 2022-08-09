@@ -14,9 +14,9 @@ class App extends React.Component {
         isTfReady: false,
         accelerometerData: { x: 0, y: 0, z: 0 },
         gyroscopeData: { x: 0, y: 0, z: 0 },
-        prediction : false,
+        result : false,
         seq : [],
-        prediction : false
+        
         // screenorientationData: { x: 0, y: 0, z: 0}
     }
 
@@ -32,7 +32,7 @@ class App extends React.Component {
        // this._subscribeToScreenOrientation();
 
 
-        
+        const list = ['a', 'b', 'c', 'd', 'e']
         const model = await tf.loadLayersModel(modelJSON);
         model.summary();
         this.setState({ model })
@@ -51,12 +51,13 @@ class App extends React.Component {
         const input = tf.concat([seq_ten, seq_ten,seq_ten, seq_ten,seq_ten, seq_ten,seq_ten, seq_ten,seq_ten, seq_ten,seq_ten,
            seq_ten,seq_ten, seq_ten,seq_ten, seq_ten,seq_ten, seq_ten,seq_ten, seq_ten])
         const input_real = input.reshape([1, 20, 6])
-        // console.log(input_real)
 
-      
+        const prediction = this.state.model.predict(input_real);
+        prediction.print();
+        
 
-        const prediction = this.state.model.predict(input_real)
-        console.log(prediction)
+        this.setState({result:(await prediction.argMax(-1).array())[0]})
+
 
     }
 
@@ -115,6 +116,11 @@ class App extends React.Component {
                 <Text style={styles.paragraph}>
                     { this.state.seq }
                 </Text>
+
+                <Text style={styles.paragraph}>
+                    { this.state.result }
+                </Text>
+
 
                
                 <Text style={styles.paragraph}>
