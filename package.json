@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "expo-cli": "^6.0.1"
+    "expo-cli": "^4.3.0",
+    "react-native-csv": "^0.2.0"
   }
 }
